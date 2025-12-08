@@ -5,12 +5,14 @@ import { fetchSales } from "./api";
 
 function App() {
   const [filters, setFilters] = useState({
-    search: "",
-    customerRegion: "",
-    gender: "",
-    minAge: "",
-    maxAge: ""
-  });
+  search: "",
+  customerRegion: [],   
+  gender: [],           
+  minAge: "",
+  maxAge: "",
+  category: []          
+});
+
 
   const [data, setData] = useState([]);
   const [pagination, setPagination] = useState({
@@ -67,10 +69,13 @@ function App() {
   };
 
   return (
-    <div style={{ padding: 24, maxWidth: 1100, margin: "0 auto" }}>
-      <h1 style={{ textAlign: "center", marginBottom: 20 }}>
+    <div className="app-container">
+      <h1 className="app-title">
         Retail Sales Management
       </h1>
+      <p style={{ textAlign: "center", color: "#6b7280", marginBottom: "32px" }}>
+        Track and analyze your sales data with powerful filters
+      </p>
 
       <Filters
         filters={filters}
@@ -78,26 +83,23 @@ function App() {
         onApply={handleApplyFilters}
       />
 
-      {loading ? <p>Loading...</p> : <SalesTable data={data} />}
+      {loading ? <p className="loading-text">Loading...</p> : <SalesTable data={data} />}
 
-      <div style={{ marginTop: 16, textAlign: "center" }}>
+      <div className="pagination-container">
         <button
           onClick={handlePrev}
           disabled={pagination.page <= 1}
-          style={{ marginRight: 10, padding: "6px 12px" }}
         >
-          Previous
+          ← Previous
         </button>
-        <span>
-          Page {pagination.page} of {pagination.totalPages} | Total:{" "}
-          {pagination.totalItems}
+        <span className="pagination-info">
+          Page {pagination.page} of {pagination.totalPages} | Total: {pagination.totalItems}
         </span>
         <button
           onClick={handleNext}
           disabled={pagination.page >= pagination.totalPages}
-          style={{ marginLeft: 10, padding: "6px 12px" }}
         >
-          Next
+          Next →
         </button>
       </div>
     </div>
