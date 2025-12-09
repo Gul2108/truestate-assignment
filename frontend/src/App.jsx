@@ -1,3 +1,4 @@
+// frontend/src/App.jsx
 import { useEffect, useState } from "react";
 import Filters from "./components/Filters";
 import SalesTable from "./components/SalesTable";
@@ -5,14 +6,13 @@ import { fetchSales } from "./api";
 
 function App() {
   const [filters, setFilters] = useState({
-  search: "",
-  customerRegion: [],   
-  gender: [],           
-  minAge: "",
-  maxAge: "",
-  category: []          
-});
-
+    search: "",
+    customerRegion: [],   // UI uses this
+    gender: [],           // UI uses this
+    minAge: "",
+    maxAge: "",
+    category: []          // UI uses this
+  });
 
   const [data, setData] = useState([]);
   const [pagination, setPagination] = useState({
@@ -26,12 +26,33 @@ function App() {
     try {
       setLoading(true);
 
+      // Map UI filter names -> backend filter names
       const params = {
         page,
         pageSize: 10,
+
+        // search (same on both sides)
         search: filters.search || undefined,
-        customerRegion: filters.customerRegion || undefined,
-        gender: filters.gender || undefined,
+
+        // customerRegion[] -> regions[]
+        regions:
+          filters.customerRegion && filters.customerRegion.length
+            ? filters.customerRegion
+            : undefined,
+
+        // gender[] -> genders[]
+        genders:
+          filters.gender && filters.gender.length
+            ? filters.gender
+            : undefined,
+
+        // category[] -> categories[]
+        categories:
+          filters.category && filters.category.length
+            ? filters.category
+            : undefined,
+
+        // age range
         minAge: filters.minAge || undefined,
         maxAge: filters.maxAge || undefined
       };
@@ -70,10 +91,14 @@ function App() {
 
   return (
     <div className="app-container">
-      <h1 className="app-title">
-        Retail Sales Management
-      </h1>
-      <p style={{ textAlign: "center", color: "#6b7280", marginBottom: "32px" }}>
+      <h1 className="app-title">Retail Sales Management</h1>
+      <p
+        style={{
+          textAlign: "center",
+          color: "#6b7280",
+          marginBottom: "32px"
+        }}
+      >
         Track and analyze your sales data with powerful filters
       </p>
 
@@ -83,17 +108,19 @@ function App() {
         onApply={handleApplyFilters}
       />
 
-      {loading ? <p className="loading-text">Loading...</p> : <SalesTable data={data} />}
+      {loading ? (
+        <p className="loading-text">Loading...</p>
+      ) : (
+        <SalesTable data={data} />
+      )}
 
       <div className="pagination-container">
-        <button
-          onClick={handlePrev}
-          disabled={pagination.page <= 1}
-        >
+        <button onClick={handlePrev} disabled={pagination.page <= 1}>
           ← Previous
         </button>
         <span className="pagination-info">
-          Page {pagination.page} of {pagination.totalPages} | Total: {pagination.totalItems}
+          Page {pagination.page} of {pagination.totalPages} | Total:{" "}
+          {pagination.totalItems}
         </span>
         <button
           onClick={handleNext}
