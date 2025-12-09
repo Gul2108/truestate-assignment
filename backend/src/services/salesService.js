@@ -13,12 +13,31 @@ export const fetchSales = async (filters, sorting, pagination) => {
   const query = {};
 
   // 🔍 Search on customer_name OR phone_number
-  if (filters.search) {
-    query.$or = [
-      { customer_name: { $regex: filters.search, $options: "i" } },
-      { phone_number: { $regex: filters.search } }
-    ];
-  }
+  // 🔍 Search on name / phone / product / region
+if (filters.search) {
+  const regex = new RegExp(filters.search, "i"); // case-insensitive
+
+  query.$or = [
+    // Different possible field names for customer name
+    { customer_name: regex },        // snake_case
+    { customerName: regex },         // camelCase
+    { "Customer Name": regex },      // CSV header style
+
+    // Phone fields
+    { phone_number: { $regex: filters.search, $options: "i" } },
+    { phoneNumber: { $regex: filters.search, $options: "i" } },
+    { "Phone Number": { $regex: filters.search, $options: "i" } },
+
+    // Extra: product / region bhi search ho jaaye to accha lagta hai
+    { product_name: regex },
+    { productName: regex },
+    { "Product Name": regex },
+    { customer_region: regex },
+    { customerRegion: regex },
+    { "Customer Region": regex },
+  ];
+}
+
 
   // 🌍 Customer Region (multi-select)
   if (filters.regions.length) {
